@@ -3,12 +3,11 @@ package Catalyst::Helper::Controller::Scaffold::HTML::Template;
 use strict;
 use Path::Class;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
 Catalyst::Helper::Controller::Scaffold::HTML::Template - Helper for Scaffolding using HTML::Template.
-This module is heavily based on Catalyst::Helper::Controller::Scaffold.
 
 =head1 SYNOPSIS
 
@@ -18,30 +17,58 @@ This module is heavily based on Catalyst::Helper::Controller::Scaffold.
 
 =head1 DESCRIPTION
 
-Helper for Scaffolding.
+This module is heavily based on Catalyst::Helper::Controller::Scaffold.
+It provides a framework to do the basic data operations (edit, view, list, 
+delete, add).
 
-Templates are HTML::Template so you'll need a HTML::Template View Component and a forward in
-your end action too.
+Scaffolding is very simple with Catalyst, as most of the code will be automagically
+generated to handle the basic operations.
 
-Note that you have to add these lines to your CDBI class...
+Let's say you want to handle the data in SomeTable, all you have to do is :
+
+   script/myapp_create.pl controller SomeTable Scaffold::HTML::Template CDBI::SomeTable
+
+this will create a controller for SomeTable using the model CDBI::SomeTable and
+all the required HTML::Template, namely :
+
+   lib/myapp/C/SomeTable.pm
+   root/SomeTable/add.tmpl
+   root/SomeTable/edit.tmpl
+   root/SomeTable/list.tmpl
+   root/SomeTable/view.tmpl
+
+Now just add these lines to your CDBI class...
 
     use Class::DBI::AsForm;
     use Class::DBI::FromForm;
 
-...and these to your application class, to load the FormValidator plugin.
+...and modify the one in your application class, to load the FormValidator plugin.
 
-    use Catalyst qw/FormValidator/;
+    use Catalyst qw/-Debug FormValidator/;
 
+You're done !
+
+Just browse http://127.0.0.1:3000/sometable and enjoy the Catalyst's power :
+You can now add elements in SomeTable, view them, modify them, list them and delete them.
+    
 =head1 METHODS
 
 =over 4
 
 =item mk_compclass
 
+mk_compclass now accept a hashref as its last argument.
+This hash can be used to overrides all $helper attributes
+before calling its mk_dir and render_file methods
+
 =cut
 
 sub mk_compclass {
-    my ( $self, $helper, $table_class ) = @_;
+    my ( $self, $helper, $table_class, $ref_options ) = @_;
+    if ($ref_options) {
+    	my %options = %$ref_options;
+    	for (keys %options) { $helper->{$_} = $options{$_} }
+    }
     $helper->{table_class} = $helper->{app} . '::M::' . $table_class;
     my $file = $helper->{file};
     my $dir = dir( $helper->{base}, 'root', $helper->{prefix} );
@@ -232,44 +259,54 @@ it under the same terms as perl itself.
 1;
 
 __add__
-<form action="<TMPL_VAR NAME="base">[% uri %]/do_add" method = "post"> 
+<form action="<TMPL_VAR NAME="base">[% uri %]/do_add" method="post"> 
 	<TMPL_LOOP NAME="columns"> 
-		<TMPL_VAR NAME="column"><br/> 
-		<TMPL_VAR NAME="field"><br/>
+		<TMPL_VAR NAME="column"><br /> 
+		<TMPL_VAR NAME="field"><br />
 	</TMPL_LOOP>
-    <input type="submit" value="Add"/> 
-<form/> <br />
+    <input type="submit" value="Add" /> 
+</form> <br />
 <a href="<TMPL_VAR NAME="base">[% uri %]/list">List</a>
 __edit__
 <form action="<TMPL_VAR NAME="base">[% uri %]/do_edit/<TMPL_VAR NAME="id">" method="post">
     <TMPL_LOOP NAME="columns">
-        <TMPL_VAR NAME="column"><br/>
-        <TMPL_VAR NAME="field"><br/>
+        <TMPL_VAR NAME="column"><br />
+        <TMPL_VAR NAME="field"><br />
     </TMPL_LOOP>
-    <input type="submit" value="Edit"/>
-<form/>
-<br/>
+    <input type="submit" value="Edit" />
+</form>
+<br />
 <a href="<TMPL_VAR NAME = "base">[% uri %]/list">List</a>
 __list__
-<table> <tr>
-        <TMPL_LOOP NAME="columns">
-            <th> <TMPL_VAR NAME="column"> </th> </TMPL_LOOP>
-    </tr>
-    <TMPL_LOOP NAME="objects">
-    <tr>
-  <TMPL_LOOP NAME="columns"> <td> <TMPL_VAR NAME="column"> </td> </TMPL_LOOP>
-            <td>
-                <a href="<TMPL_VAR NAME="base">[% uri %]/view/<TMPL_VAR NAME="id">"> View </a>
-  <a href="<TMPL_VAR NAME="base">[% uri %]/edit/<TMPL_VAR NAME="id">"> Edit </a>
-                <a href="<TMPL_VAR NAME="base">[% uri %]/destroy/<TMPL_VAR NAME="id">"> Destroy </a>
-            </td>
-    </tr>
+<table>
+  <tr>
+     <TMPL_LOOP NAME="columns">
+        <th> <TMPL_VAR NAME="column"> </th>
+     </TMPL_LOOP>
+   </tr>
+  <TMPL_LOOP NAME="objects">
+   <tr>
+    <TMPL_LOOP NAME="columns"> 
+       <td> <TMPL_VAR NAME="column"> </td>
     </TMPL_LOOP>
+       <td>
+         <a href="<TMPL_VAR NAME="base">[% uri %]/view/<TMPL_VAR NAME="id">"> 
+           View
+         </a>
+         <a href="<TMPL_VAR NAME="base">[% uri %]/edit/<TMPL_VAR NAME="id">">
+           Edit 
+         </a>
+         <a href="<TMPL_VAR NAME="base">[% uri %]/destroy/<TMPL_VAR NAME="id">">
+           Destroy 
+         </a>
+       </td>
+   </tr>
+  </TMPL_LOOP>
 </table>
 <a href="<TMPL_VAR NAME="base">[% uri %]/add">Add</a>
 __view__
 <TMPL_LOOP NAME="columns"> 
-	<b><TMPL_VAR NAME="column"></b><br/>
-	<TMPL_VAR NAME="value"><br/><br/>
+	<b><TMPL_VAR NAME="column"></b><br />
+	<TMPL_VAR NAME="value"><br/><br />
 </TMPL_LOOP>
 <a href="<TMPL_VAR NAME="base">[% uri %]/list">List</a>

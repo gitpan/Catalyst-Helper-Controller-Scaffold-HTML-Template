@@ -9,6 +9,11 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Catalyst/Helper/Controller/Scaffold/HTML/Template.pm',
     requires => {
         'Test::More' => 0,
+	'Catalyst' => 5.23,
+        'Catalyst::Plugin::FormValidator' => 0,
+	'Class::DBI::AsForm' => 0,
+	'Class::DBI::FromForm' => 0,
+	'Class::View::HTML::Template' => 0,
     },
     add_to_cleanup      => [ 'Catalyst-Helper-Controller-Scaffold-HTML-Template-*' ],
 );

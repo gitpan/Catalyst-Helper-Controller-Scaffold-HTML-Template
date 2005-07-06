@@ -6,5 +6,6 @@ Makefile.PL
 README
 lib/Catalyst/Helper/Controller/Scaffold/HTML/Template.pm
 t/00-load.t
+t/01-creation.t
 t/pod-coverage.t
 t/pod.t
