@@ -9,10 +9,10 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Catalyst/Helper/Controller/Scaffold/HTML/Template.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
-        'Catalyst' => 5.23,
+    'Test::More' => 0,
+    'Catalyst' => 5.23,
 	'Catalyst::View::HTML::Template' => 0,
-        'Catalyst::Plugin::FormValidator' => 0,
+    'Catalyst::Plugin::FormValidator' => 0,
 	'Class::DBI::AsForm' => 0,
 	'Class::DBI::FromForm' => 0,
     },
