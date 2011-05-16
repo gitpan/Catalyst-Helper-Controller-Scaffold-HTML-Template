@@ -9,3 +9,6 @@ Revision history for Catalyst-Helper-Controller-Scaffold-HTML-Template
 
 0.03    2005-07-08
         Corrected the archive (permissions, prerequisites...)
+
+0.04    2011-05-12
+        Corrected t/01-creation.t to skip tests when Catalyst::Helper missing

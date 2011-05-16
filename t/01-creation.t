@@ -1,28 +1,41 @@
 use Test::More tests => 12;
 
-use Catalyst::Helper;
+SKIP: {
 
-my @files = qw[t/Generated.pm t/root/SomeTable/edit.tmpl t/root/SomeTable/add.tmpl t/root/SomeTable/list.tmpl t/root/SomeTable/view.tmpl];
+    eval { require Catalyst::Helper; };
 
-for my $file (@files) {
-	ok(! -e $file,"$file should not be present");
-    diag("Testing $file is not present");
-}
+    skip "Catalyst::Helper not installed", 12 if $@;
 
-my $helper = Catalyst::Helper->new;
+    my @files =
+    qw[t/Generated.pm t/root/SomeTable/edit.tmpl t/root/SomeTable/add.tmpl t/root/SomeTable/list.tmpl t/root/SomeTable/view.tmpl];
 
-ok($helper,'Helper creation');
-diag("Helper created");
+    for my $file (@files) {
+        ok( !-e $file, "$file should not be present" );
+        diag("Testing $file is not present");
+    }
 
-ok($helper->mk_component( 	'TestApp', "controller", "SomeTable", "Scaffold::HTML::Template", 
-				"CDBI::SomeTable", {file => './t/Generated.pm', base => './t/'} ),	'Files crestion');
+    my $helper = Catalyst::Helper->new;
 
-for my $file (@files) {
-	ok(-e $file,"$file  creation");
-    diag("Testing $file creation");
-}
+    ok( $helper, 'Helper creation' );
+    diag("Helper created");
 
-for my $file (@files) {
-	unlink $file;
+    ok(
+        $helper->mk_component(
+            'TestApp',   "controller",
+            "SomeTable", "Scaffold::HTML::Template",
+            "CDBI::SomeTable", { file => './t/Generated.pm', base => './t/' }
+        ),
+        'Files crestion'
+    );
+
+    for my $file (@files) {
+        ok( -e $file, "$file  creation" );
+        diag("Testing $file creation");
+    }
+
+    for my $file (@files) {
+        unlink $file;
+    }
+
 }
 	
